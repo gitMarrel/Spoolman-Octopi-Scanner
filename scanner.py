@@ -69,19 +69,14 @@ def barcode_reader():
     return ss
 
 def setSelection(id):
-    url = 'http://localhost/plugin/filamentmanager/selections/0'
+    url = 'http://localhost/plugin/Spoolman/self/spool'
     headers = {'X-Api-Key': config.API_KEY}
     payload = {
-        "selection": {
-            "tool": 0, 
-            "spool": {
-                "id": id
-            }   
-        },
-        "update": True
+        "toolIdx":0,
+        "spoolId":id
     }
     try:
-        r = requests.patch(url, json=payload, headers=headers)
+        r = requests.post(url, json=payload, headers=headers)
         print(r.text)
         return r
     except Exception as e:
@@ -97,11 +92,16 @@ if __name__ == '__main__':
             except Exception as e:
                 print(e)
                 continue
-            
+
+            print(code)
+
+            splt = code.split("-")
+            code = splt[1]
+
             print(code)
 
             headers = {'X-Api-Key': config.API_KEY}
-            url = 'http://localhost/plugin/filamentmanager/spools'
+            url = 'http://localhost/plugin/Spoolman/spoolman/spools'
             try:
                 r = requests.get(url, headers=headers)
             except Exception as e:
@@ -111,50 +111,19 @@ if __name__ == '__main__':
             spools = r.json()
             currentSpool = {}
             foundSpool = False
-            for spool in spools["spools"]:
-                if code == spool["name"]:
+            for spool in spools["data"]["spools"]:
+                if code == spool["id"]:
                     currentSpool = spool
                     foundSpool = True
                     break
-
             if foundSpool:
                 print("Spool in database")
                 try:
-                    setSelection(currentSpool["id"])
+                    setSelection(code)
                 except Exception as e:
                     print(e)
-
             else:
-                print("New spool")
-                url = 'http://localhost/plugin/filamentmanager/spools'
-                headers = {'X-Api-Key': config.API_KEY}
-                payload = {
-                    "spool": {
-                        "id": None,
-                        "name": code,
-                        "cost": 20,
-                        "weight": 1000,
-                        "used": 0,
-                        "temp_offset": 0    ,
-                        "profile": {
-                            "id": 1
-                        }
-                    },
-                    "update": True
-                }
-
-                try:
-                    r = requests.post(url, json=payload, headers=headers)
-                except Exception as e:
-                    print(e)
-                    continue
-
-                spool = r.json()["spool"]
-                
-                try:
-                    setSelection(spool["id"])
-                except Exception as e:
-                    print(e)
+                print("Spool NOT in database. Doing nothing.")
                 
     except KeyboardInterrupt:
         pass
