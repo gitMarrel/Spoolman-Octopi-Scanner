@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/bin/python3 -u scanner.py
-WorkingDirectory=/home/pi/Filament-Manager-Barcodes
+WorkingDirectory=/home/pi/Spoolman-Octopi-Scanner
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
