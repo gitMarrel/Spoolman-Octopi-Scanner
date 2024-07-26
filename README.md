@@ -37,6 +37,7 @@ sudo systemctl enable scanner.service
 ```
 
 Plug in your barcode/qrcode scanner
+
 Start the Service and start scanning!
 
 ```bash
